@@ -1,15 +1,20 @@
+import pymysql
+pymysql.install_as_MySQLdb()
+
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager
 from config import Config
 from dotenv import load_dotenv
+
+from models.user import db, User
+from api.auth import auth_bp
 
 # Load environment variables
 load_dotenv()
 
 # Import models
-from models.user import User, db as user_db
-from models.profile import Profile, Skill, Experience, Education, db as profile_db
+# from models.profile import Profile, Skill, Experience, Education
 
 # Create Flask app
 app = Flask(__name__)
@@ -17,15 +22,19 @@ app.config.from_object(Config)
 
 # Initialize extensions
 CORS(app)
+JWTManager(app)
 
 # Initialize database
-db = SQLAlchemy(app)
+db.init_app(app)
 
 def setup_database():
     """Setup database tables"""
     with app.app_context():
         db.create_all()
         print("✅ Database tables created successfully!")
+
+# Register blueprints
+app.register_blueprint(auth_bp)
 
 # Create a function to initialize the app
 def create_app():
