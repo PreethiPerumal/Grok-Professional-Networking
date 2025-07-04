@@ -9,6 +9,8 @@ const initialProfile = {
   bio: 'Passionate software engineer.',
   skills: ['JavaScript', 'React'],
   avatar: '',
+  title: 'Software Engineer',
+  location: 'San Francisco, CA',
 };
 
 type ProfileType = typeof initialProfile;
@@ -148,38 +150,66 @@ const ProfileEdit: React.FC = () => {
       </nav>
       <div className="py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-3xl font-bold" style={{ color: 'var(--accent)' }}>Edit Profile</h2>
-            <Link to="/profile" className="btn-accent-outline">Back to Profile</Link>
+          {/* Header Card - matches ProfileView style */}
+          <div className="card flex flex-col md:flex-row items-center md:items-end mb-6 relative">
+            {/* Avatar Upload/Preview */}
+            <div className="flex flex-col items-center md:items-start w-full md:w-auto">
+              <div {...getRootProps()} className="w-28 h-28 rounded-full bg-gradient-to-br from-purpleAccent-500 to-purpleDark-700 flex items-center justify-center text-5xl mb-4 text-white shadow-glow-purple border-4 border-purpleAccent-400 cursor-pointer transition-colors hover:scale-105">
+                <input {...getInputProps()} />
+                {avatarPreview ? (
+                  <img src={avatarPreview} alt="Avatar Preview" className="w-28 h-28 rounded-full object-cover" />
+                ) : (
+                  <span role="img" aria-label="profile pic">👤</span>
+                )}
+              </div>
+              <p className="text-xs text-center mb-2" style={{ color: 'var(--text-secondary)' }}>Drag & drop or click to change</p>
+              {uploading && <div className="mt-1 font-medium" style={{ color: 'var(--accent)' }}>Uploading...</div>}
+            </div>
+            {/* Editable Fields */}
+            <div className="flex-1 md:ml-8 w-full md:w-auto">
+              <div className="text-center md:text-left">
+                <input
+                  className="text-3xl font-bold mb-2 bg-transparent outline-none border-b-2 border-transparent focus:border-purpleAccent-400 transition-colors w-full md:w-auto"
+                  style={{ color: 'var(--text-main)' }}
+                  name="username"
+                  value={values.username}
+                  onChange={handleChange}
+                  onBlur={handleChange}
+                  disabled={submitting}
+                  placeholder="Your Name"
+                  maxLength={40}
+                />
+                {touched.username && errors.username && <div className="text-red-500 text-sm mb-1">{errors.username}</div>}
+                <input
+                  className="text-lg mb-1 bg-transparent outline-none border-b-2 border-transparent focus:border-purpleAccent-400 transition-colors w-full md:w-auto"
+                  style={{ color: 'var(--text-secondary)' }}
+                  name="title"
+                  value={values.title || ''}
+                  onChange={e => setValues(v => ({ ...v, title: e.target.value }))}
+                  disabled={submitting}
+                  placeholder="Your Title (e.g. Software Engineer)"
+                  maxLength={60}
+                />
+                <input
+                  className="flex items-center justify-center md:justify-start text-base bg-transparent outline-none border-b-2 border-transparent focus:border-purpleAccent-400 transition-colors w-full md:w-auto"
+                  style={{ color: 'var(--accent)' }}
+                  name="location"
+                  value={values.location || ''}
+                  onChange={e => setValues(v => ({ ...v, location: e.target.value }))}
+                  disabled={submitting}
+                  placeholder="Location (e.g. City, Country)"
+                  maxLength={60}
+                />
+              </div>
+            </div>
+            {/* Back Button */}
+            <Link to="/profile" className="absolute top-4 right-4 btn-accent-outline">Back to Profile</Link>
           </div>
-        <form className="card mb-4" onSubmit={handleSubmit}>
-      {/* Avatar Upload */}
-      <div {...getRootProps()} className={`border-2 border-dashed rounded-lg p-6 mb-6 text-center cursor-pointer transition-colors ${isDragActive ? 'border-purpleAccent-400 bg-purpleAccent-500/10' : 'border-purpleAccent-400 hover:border-purpleAccent-500'}`} style={{ background: 'var(--bg-card)' }}>
-        <input {...getInputProps()} />
-        {avatarPreview ? (
-          <img src={avatarPreview} alt="Avatar Preview" className="mx-auto w-24 h-24 rounded-full mb-3 shadow-glow-purple border-4 border-purpleAccent-400" />
-        ) : (
-          <div className="w-24 h-24 mx-auto mb-3 rounded-full bg-gradient-to-br from-purpleAccent-500 to-purpleDark-700 flex items-center justify-center text-3xl text-white shadow-glow-purple border-4 border-purpleAccent-400">
-            👤
-          </div>
-        )}
-        <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Drag & drop an image, or click to select</p>
-        <p className="text-xs" style={{ color: 'var(--accent)' }}>Supports: JPG, PNG, GIF (max 5MB)</p>
-        {uploading && <div className="mt-3 font-medium" style={{ color: 'var(--accent)' }}>Uploading...</div>}
-      </div>
+          {/* Profile Edit Form */}
+          <form className="card mb-4" onSubmit={handleSubmit}>
+      {/* Remove avatar upload from here, as it's now in the header */}
       <Input
-        label="Username"
-        name="username"
-        value={values.username}
-        onChange={handleChange}
-        onBlur={handleChange}
-        disabled={submitting}
-        placeholder="Enter your username"
-        className="input-theme"
-      />
-      {touched.username && errors.username && <div className="text-red-500 text-sm mb-3 -mt-2">{errors.username}</div>}
-      <Input
-        label="Email"
+        label={<span style={{ color: 'var(--accent)' }}>Email</span>}
         name="email"
         value={values.email}
         onChange={handleChange}
