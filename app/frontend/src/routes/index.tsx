@@ -8,46 +8,47 @@ import PostList from '../components/posts/PostList';
 import Feed from '../components/feed/Feed';
 import JobList from '../components/job-board/JobList';
 import MessageList from '../components/messaging/MessageList';
+import GlobalLayout from '../components/GlobalLayout';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Login />,
+    element: <GlobalLayout><Login /></GlobalLayout>,
   },
   {
     path: '/login',
-    element: <Login />,
+    element: <GlobalLayout><Login /></GlobalLayout>,
   },
   {
     path: '/signup',
-    element: <Signup />,
+    element: <GlobalLayout><Signup /></GlobalLayout>,
   },
   {
     path: '/profile',
-    element: <ProfileView />,
+    element: <GlobalLayout><ProfileView /></GlobalLayout>,
   },
   {
     path: '/profile/edit',
-    element: <ProfileEdit />,
+    element: <GlobalLayout><ProfileEdit /></GlobalLayout>,
   },
   {
     path: '/posts/create',
-    element: <PostCreate />,
+    element: <GlobalLayout><PostCreate /></GlobalLayout>,
   },
   {
     path: '/posts',
-    element: <PostList />,
+    element: <GlobalLayout><PostList /></GlobalLayout>,
   },
   {
     path: '/jobs',
-    element: <JobList />,
+    element: <GlobalLayout><JobList /></GlobalLayout>,
   },
   {
     path: '/messages',
-    element: <MessageList />,
+    element: <GlobalLayout><MessageList /></GlobalLayout>,
   },
   {
     path: '/feed',
-    element: <Feed />,
+    element: <GlobalLayout><Feed /></GlobalLayout>,
   },
 ]); 

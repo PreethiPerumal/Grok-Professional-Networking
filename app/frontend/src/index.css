@@ -4,22 +4,98 @@
 
 /* Custom styles can be added below */
 @layer base {
+  @keyframes gradient-move {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+  html[data-theme='light'] {
+    --bg-main: linear-gradient(120deg, #f8f8ff 0%, #e0aaff 100%);
+    --bg-card: #fff;
+    --text-main: #2d0b4e;
+    --text-secondary: #4b206b;
+    --accent: #a259f7;
+    --shadow-card: 0 4px 32px 0 rgba(162,89,247,0.08);
+  }
+  html[data-theme='purple'] {
+    --bg-main: linear-gradient(120deg, #2d0b4e 0%, #4b206b 50%, #a259f7 100%);
+    --bg-card: rgba(58,24,90,0.85);
+    --text-main: #fff;
+    --text-secondary: #c084fc;
+    --accent: #a259f7;
+    --shadow-card: 0 4px 32px 0 rgba(162,89,247,0.4);
+  }
   body {
-    @apply text-gray-900 bg-white dark:bg-gray-900 dark:text-white;
+    @apply transition-colors duration-300;
+    background: var(--bg-main);
+    background-size: 200% 200%;
+    animation: gradient-move 8s ease-in-out infinite;
+    color: var(--text-main);
   }
 }
 
 @layer components {
-  .btn {
-    @apply px-4 py-2 font-medium transition-colors rounded-md;
+  .card {
+    @apply rounded-2xl p-6 shadow-lg transition-colors duration-300;
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    box-shadow: var(--shadow-card);
+    animation: fade-in-up 0.7s cubic-bezier(0.39, 0.575, 0.565, 1) both;
   }
-  .btn-primary {
-    @apply text-white bg-primary hover:bg-primary-hover;
+  .btn-accent {
+    @apply font-bold py-2 px-6 rounded-xl shadow-lg transition hover:scale-105;
+    background: linear-gradient(90deg, var(--accent), #c084fc);
+    color: #fff;
+    box-shadow: 0 4px 32px 0 rgba(162,89,247,0.3);
+    transition: background 0.4s, box-shadow 0.4s, transform 0.2s;
   }
-  .btn-secondary {
-    @apply text-white bg-secondary hover:bg-secondary/90;
+  .btn-accent:hover {
+    background: linear-gradient(90deg, #c084fc, var(--accent));
+    box-shadow: 0 6px 40px 0 rgba(162,89,247,0.5);
+    transform: scale(1.07);
   }
-  .input {
-    @apply px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+  .btn-accent-outline {
+    @apply font-bold py-2 px-6 rounded-xl border-2 transition hover:scale-105;
+    border-color: var(--accent);
+    color: var(--accent);
+    background: transparent;
+    transition: background 0.4s, color 0.4s, border 0.4s, transform 0.2s;
+  }
+  .btn-accent-outline:hover {
+    background: linear-gradient(90deg, var(--accent), #c084fc);
+    color: #fff;
+    border-color: #c084fc;
+    box-shadow: 0 4px 32px 0 rgba(162,89,247,0.2);
+    transform: scale(1.07);
+  }
+  .input-theme {
+    @apply px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors duration-300;
+    background-color: var(--bg-card);
+    color: var(--text-main);
+    border-color: var(--accent);
+  }
+  @keyframes fade-in-up {
+    0% {
+      opacity: 0;
+      transform: translateY(40px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .theme-switcher-animate {
+    animation: pulse-glow 2s infinite;
+  }
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(162,89,247,0.5);
+    }
+    50% {
+      box-shadow: 0 0 24px 8px rgba(162,89,247,0.7);
+    }
   }
 }

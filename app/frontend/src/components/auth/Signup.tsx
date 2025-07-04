@@ -35,7 +35,7 @@ const Signup: React.FC = () => {
       if (res.token) {
         localStorage.setItem('token', res.token);
         setMessage('Signup successful! Redirecting...');
-        setTimeout(() => navigate('/feed'), 1000);
+        setTimeout(() => navigate('/profile'), 1000);
       } else if (res.message) {
         setMessage(res.message + ' Please login.');
         setTimeout(() => navigate('/login'), 1500);
@@ -50,66 +50,70 @@ const Signup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <h2 className="text-3xl font-bold text-center text-gray-900">Sign Up</h2>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="max-w-md w-full space-y-8 p-8 card">
+        <h2 className="text-3xl font-bold text-center mb-6" style={{ color: 'var(--accent)' }}>Sign Up</h2>
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
           <div>
-            <label className="block text-gray-700">Username</label>
+            <label className="block mb-1" style={{ color: 'var(--accent)' }}>Username</label>
             <input
               type="text"
               name="username"
               value={form.username}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-theme w-full"
+              placeholder="Enter your username"
             />
             {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
           </div>
           <div>
-            <label className="block text-gray-700">Email</label>
+            <label className="block mb-1" style={{ color: 'var(--accent)' }}>Email</label>
             <input
               type="email"
               name="email"
               value={form.email}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-theme w-full"
+              placeholder="Enter your email"
             />
             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
           </div>
           <div>
-            <label className="block text-gray-700">Password</label>
+            <label className="block mb-1" style={{ color: 'var(--accent)' }}>Password</label>
             <input
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-theme w-full"
+              placeholder="Enter your password"
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
           <div>
-            <label className="block text-gray-700">Confirm Password</label>
+            <label className="block mb-1" style={{ color: 'var(--accent)' }}>Confirm Password</label>
             <input
               type="password"
               name="confirm_password"
               value={form.confirm_password}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-theme w-full"
+              placeholder="Confirm your password"
             />
             {errors.confirm_password && <p className="text-red-500 text-sm mt-1">{errors.confirm_password}</p>}
           </div>
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
+            className="btn-accent w-full"
             disabled={loading}
           >
             {loading ? 'Signing up...' : 'Sign Up'}
           </button>
         </form>
-        {message && <div className={`text-center mt-4 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>{message}</div>}
-        <p className="text-center text-gray-600">
+        {message && <div className={`text-center mt-4 ${message.includes('success') ? 'text-green-400' : 'text-red-500'}`}>{message}</div>}
+        <p className="text-center mt-4" style={{ color: 'var(--text-secondary)' }}>
           Already have an account?{' '}
-          <Link to="/login" className="text-blue-600 hover:underline">Login</Link>
+          <Link to="/login" className="btn-accent-outline ml-1">Login</Link>
         </p>
       </div>
     </div>

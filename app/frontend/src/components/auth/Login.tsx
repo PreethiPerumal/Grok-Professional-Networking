@@ -40,7 +40,7 @@ const Login: React.FC = () => {
       if (res.token) {
         localStorage.setItem('token', res.token);
         setMessage('Login successful! Redirecting...');
-        setTimeout(() => navigate('/feed'), 1000);
+        setTimeout(() => navigate('/profile'), 1000);
       } else {
         setMessage(res.error || 'Login failed.');
       }
@@ -52,46 +52,48 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
-        <h2 className="text-3xl font-bold text-center text-gray-900">Login</h2>
+    <div className="min-h-screen flex items-center justify-center">
+      <div className="max-w-md w-full space-y-8 p-8 card">
+        <h2 className="text-3xl font-bold text-center mb-6" style={{ color: 'var(--accent)' }}>Login</h2>
         <form className="space-y-6" onSubmit={handleSubmit} noValidate>
           <div>
-            <label className="block text-gray-700">Username or Email</label>
+            <label className="block mb-1" style={{ color: 'var(--accent)' }}>Username or Email</label>
             <input
               type="text"
               name="usernameOrEmail"
               value={form.usernameOrEmail}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-theme w-full"
+              placeholder="Enter your username or email"
               disabled={loading}
             />
             {errors.usernameOrEmail && <p className="text-red-500 text-sm mt-1">{errors.usernameOrEmail}</p>}
           </div>
           <div>
-            <label className="block text-gray-700">Password</label>
+            <label className="block mb-1" style={{ color: 'var(--accent)' }}>Password</label>
             <input
               type="password"
               name="password"
               value={form.password}
               onChange={handleChange}
-              className="mt-1 w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="input-theme w-full"
+              placeholder="Enter your password"
               disabled={loading}
             />
             {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
           <button
             type="submit"
-            className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 transition disabled:opacity-50"
+            className="btn-accent w-full"
             disabled={loading}
           >
             {loading ? 'Logging in...' : 'Login'}
           </button>
         </form>
-        {message && <div className={`text-center mt-4 ${message.includes('success') ? 'text-green-600' : 'text-red-600'}`}>{message}</div>}
-        <p className="text-center text-gray-600">
+        {message && <div className={`text-center mt-4 ${message.includes('success') ? 'text-green-400' : 'text-red-500'}`}>{message}</div>}
+        <p className="text-center mt-4" style={{ color: 'var(--text-secondary)' }}>
           Don't have an account?{' '}
-          <Link to="/signup" className="text-blue-600 hover:underline">Sign up</Link>
+          <Link to="/signup" className="btn-accent-outline ml-1">Sign up</Link>
         </p>
       </div>
     </div>
