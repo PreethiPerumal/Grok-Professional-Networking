@@ -18,7 +18,7 @@ const Signup: React.FC = () => {
     if (!form.username) newErrors.username = 'Username is required';
     if (!form.email) newErrors.email = 'Email is required';
     if (!form.password) newErrors.password = 'Password is required';
-    else if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(form.password)) newErrors.password = 'Password must be at least 8 characters and contain a letter and a number';
+    else if (form.password.length < 8) newErrors.password = 'Password must be at least 8 characters';
     if (!form.confirm_password) newErrors.confirm_password = 'Please confirm your password';
     else if (form.password !== form.confirm_password) newErrors.confirm_password = 'Passwords do not match';
     setErrors(newErrors);

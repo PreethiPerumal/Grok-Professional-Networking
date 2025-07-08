@@ -18,9 +18,9 @@ const Login: React.FC = () => {
     const newErrors: typeof errors = {};
     if (!form.usernameOrEmail) newErrors.usernameOrEmail = 'Username or Email is required';
     if (!form.password) newErrors.password = 'Password is required';
-    // Password complexity: min 8 chars, at least 1 letter and 1 number
-    if (form.password && !/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(form.password)) {
-      newErrors.password = 'Password must be at least 8 characters and contain a letter and a number';
+    // Only require minimum length 8, allow any character
+    if (form.password && form.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
