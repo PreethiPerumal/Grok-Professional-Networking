@@ -16,7 +16,16 @@ def signup():
     password = data.get('password')
     if not username or not email or not password:
         return jsonify({'error': 'Missing required fields'}), 400
-    user = User(username=username, email=email)
+    user = User(
+        username=username,
+        email=email,
+        bio="",
+        skills="",
+        work_experience="",
+        education="",
+        contact_info="",
+        image_url=""
+    )
     user.set_password(password)
     db.session.add(user)
     try:
@@ -35,7 +44,7 @@ def login():
         return jsonify({'error': 'Missing credentials'}), 400
     user = User.query.filter(or_(User.username == identifier, User.email == identifier)).first()
     if user and user.check_password(password):
-        access_token = create_access_token(identity=user.id)
+        access_token = create_access_token(identity=str(user.id))
         return jsonify({'token': access_token, 'user': {'id': user.id, 'username': user.username, 'email': user.email}}), 200
     return jsonify({'error': 'Invalid credentials'}), 401
 

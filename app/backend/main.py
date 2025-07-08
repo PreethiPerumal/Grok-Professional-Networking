@@ -1,14 +1,17 @@
 import pymysql
 pymysql.install_as_MySQLdb()
 
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 from config import Config
 from dotenv import load_dotenv
+from flask_migrate import Migrate
+import os
 
 from models.user import db, User
 from api.auth import auth_bp
+from api.profile import profile_bp
 
 # Load environment variables
 load_dotenv()
@@ -26,6 +29,13 @@ JWTManager(app)
 
 # Initialize database
 db.init_app(app)
+migrate = Migrate(app, db)
+
+# Serve uploaded files
+@app.route('/uploads/<path:filename>')
+def uploaded_file(filename):
+    uploads_dir = os.path.join(os.path.dirname(__file__), 'uploads')
+    return send_from_directory(uploads_dir, filename)
 
 def setup_database():
     """Setup database tables"""
@@ -35,6 +45,7 @@ def setup_database():
 
 # Register blueprints
 app.register_blueprint(auth_bp)
+app.register_blueprint(profile_bp)
 
 # Create a function to initialize the app
 def create_app():

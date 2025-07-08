@@ -1,25 +1,83 @@
+import type { Profile, ProfileImageUpload } from '../../types';
+
 const API_URL = 'http://localhost:5000';
 
+// Helper function to get auth headers
+const getAuthHeaders = () => ({
+  'Authorization': `Bearer ${localStorage.getItem('token')}`,
+});
+
+// Helper function to handle API responses
+const handleResponse = async (response: Response) => {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
+  }
+  return response.json();
+};
+
 export const profileApi = {
-  getProfile: async () => {
-    const response = await fetch(`${API_URL}/profile`, {
+  // Get user profile
+  getProfile: async (): Promise<Profile> => {
+    const response = await fetch(`${API_URL}/api/profile`, {
       headers: {
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+        ...getAuthHeaders(),
+        'Content-Type': 'application/json',
       },
     });
-    return response.json();
+    return handleResponse(response);
   },
 
-  updateProfile: async (profileData: any) => {
-    const response = await fetch(`${API_URL}/profile`, {
+  // Update user profile
+  updateProfile: async (profileData: Partial<Profile>): Promise<Profile> => {
+    const response = await fetch(`${API_URL}/api/profile`, {
       method: 'PUT',
       headers: {
+        ...getAuthHeaders(),
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
       body: JSON.stringify(profileData),
     });
-    return response.json();
+    return handleResponse(response);
+  },
+
+  // Upload profile image
+  uploadProfileImage: async (file: File): Promise<ProfileImageUpload> => {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch(`${API_URL}/api/profile/image`, {
+      method: 'POST',
+      headers: {
+        ...getAuthHeaders(),
+        // Don't set Content-Type for FormData, let browser set it with boundary
+      },
+      body: formData,
+    });
+    return handleResponse(response);
+  },
+
+  // Validate file before upload
+  validateImageFile: (file: File): { isValid: boolean; error?: string } => {
+    // Check file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(file.type)) {
+      return { 
+        isValid: false, 
+        error: 'Invalid file type. Only JPG, JPEG, and PNG files are allowed.' 
+      };
+    }
+
+    // Check file size (5MB limit)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      return { 
+        isValid: false, 
+        error: 'File too large. Maximum size is 5MB.' 
+      };
+    }
+
+    return { isValid: true };
   },
 };
 

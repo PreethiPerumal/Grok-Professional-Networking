@@ -7,12 +7,20 @@ export interface User {
 
 export interface Profile {
   id: number;
-  user_id: number;
+  username: string;
+  email: string;
   bio: string;
-  location: string;
-  skills: string[];
-  experience: Experience[];
-  education: Education[];
+  skills: string;
+  work_experience: string;
+  education: string;
+  contact_info: string;
+  image_url: string;
+}
+
+export interface ProfileImageUpload {
+  image_url: string;
+  thumbnail_url: string;
+  message: string;
 }
 
 export interface Experience {
