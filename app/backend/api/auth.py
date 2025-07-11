@@ -14,6 +14,7 @@ def signup():
     username = data.get('username')
     email = data.get('email')
     password = data.get('password')
+    is_admin = data.get('is_admin', False)
     if not username or not email or not password:
         return jsonify({'error': 'Missing required fields'}), 400
     user = User(
@@ -24,7 +25,8 @@ def signup():
         work_experience="",
         education="",
         contact_info="",
-        image_url=""
+        image_url="",
+        is_admin=is_admin
     )
     user.set_password(password)
     db.session.add(user)

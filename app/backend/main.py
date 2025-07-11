@@ -12,6 +12,7 @@ import os
 from models.user import db, User
 from api.auth import auth_bp
 from api.profile import profile_bp
+from api.posts import posts_bp
 
 # Load environment variables
 load_dotenv()
@@ -24,7 +25,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 
 # Initialize extensions
-CORS(app)
+CORS(app, origins=["http://localhost:5173"])
 JWTManager(app)
 
 # Initialize database
@@ -46,6 +47,7 @@ def setup_database():
 # Register blueprints
 app.register_blueprint(auth_bp)
 app.register_blueprint(profile_bp)
+app.register_blueprint(posts_bp)
 
 # Create a function to initialize the app
 def create_app():

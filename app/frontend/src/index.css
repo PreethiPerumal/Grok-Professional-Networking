@@ -2,100 +2,252 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom styles can be added below */
-@layer base {
-  @keyframes gradient-move {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
+/* Custom styles for quill mention */
+.ql-mention-list {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+.ql-mention-list-item {
+  padding: 8px 12px;
+  cursor: pointer;
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+.ql-mention-list-item:hover {
+  background-color: #f8fafc;
+}
+
+.ql-mention-list-item.selected {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.mention-item {
+  color: #3b82f6;
+  font-weight: 500;
+}
+
+/* Enhanced scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Smooth transitions for all elements */
+* {
+  transition: all 0.2s ease-in-out;
+}
+
+/* Enhanced focus states */
+.focus-within\:ring-2:focus-within {
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Animated background */
+.animated-bg {
+  background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
   }
-  html[data-theme='light'] {
-    --bg-main: linear-gradient(120deg, #f8f8ff 0%, #e0aaff 100%);
-    --bg-card: #fff;
-    --text-main: #2d0b4e;
-    --text-secondary: #4b206b;
-    --accent: #a259f7;
-    --shadow-card: 0 4px 32px 0 rgba(162,89,247,0.08);
+  50% {
+    background-position: 100% 50%;
   }
-  html[data-theme='purple'] {
-    --bg-main: linear-gradient(120deg, #2d0b4e 0%, #4b206b 50%, #a259f7 100%);
-    --bg-card: rgba(58,24,90,0.85);
-    --text-main: #fff;
-    --text-secondary: #c084fc;
-    --accent: #a259f7;
-    --shadow-card: 0 4px 32px 0 rgba(162,89,247,0.4);
-  }
-  body {
-    @apply transition-colors duration-300;
-    background: var(--bg-main);
-    background-size: 200% 200%;
-    animation: gradient-move 8s ease-in-out infinite;
-    color: var(--text-main);
+  100% {
+    background-position: 0% 50%;
   }
 }
 
-@layer components {
-  .card {
-    @apply rounded-2xl p-6 shadow-lg transition-colors duration-300;
-    background-color: var(--bg-card);
-    color: var(--text-main);
-    box-shadow: var(--shadow-card);
-    animation: fade-in-up 0.7s cubic-bezier(0.39, 0.575, 0.565, 1) both;
+/* Card hover effects */
+.card-hover {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Button animations */
+.btn-animate {
+  transition: all 0.3s ease;
+}
+
+.btn-animate:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.btn-animate:active {
+  transform: translateY(0);
+}
+
+/* Loading spinner */
+.spinner {
+  border: 2px solid #f3f4f6;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Fade in animation */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-  .btn-accent {
-    @apply font-bold py-2 px-6 rounded-xl shadow-lg transition hover:scale-105;
-    background: linear-gradient(90deg, var(--accent), #c084fc);
-    color: #fff;
-    box-shadow: 0 4px 32px 0 rgba(162,89,247,0.3);
-    transition: background 0.4s, box-shadow 0.4s, transform 0.2s;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  .btn-accent:hover {
-    background: linear-gradient(90deg, #c084fc, var(--accent));
-    box-shadow: 0 6px 40px 0 rgba(162,89,247,0.5);
-    transform: scale(1.07);
+}
+
+/* Slide in animation */
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
   }
-  .btn-accent-outline {
-    @apply font-bold py-2 px-6 rounded-xl border-2 transition hover:scale-105;
-    border-color: var(--accent);
-    color: var(--accent);
-    background: transparent;
-    transition: background 0.4s, color 0.4s, border 0.4s, transform 0.2s;
+  to {
+    transform: translateX(0);
+    opacity: 1;
   }
-  .btn-accent-outline:hover {
-    background: linear-gradient(90deg, var(--accent), #c084fc);
-    color: #fff;
-    border-color: #c084fc;
-    box-shadow: 0 4px 32px 0 rgba(162,89,247,0.2);
-    transform: scale(1.07);
+}
+
+/* Pulse animation */
+.pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
   }
-  .input-theme {
-    @apply px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 transition-colors duration-300;
-    background-color: var(--bg-card);
-    color: var(--text-main);
-    border-color: var(--accent);
+  50% {
+    opacity: 0.5;
   }
-  @keyframes fade-in-up {
-    0% {
-      opacity: 0;
-      transform: translateY(40px);
-    }
-    100% {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  .theme-switcher-animate {
-    animation: pulse-glow 2s infinite;
-  }
-  @keyframes pulse-glow {
-    0%, 100% {
-      box-shadow: 0 0 0 0 rgba(162,89,247,0.5);
-    }
-    50% {
-      box-shadow: 0 0 24px 8px rgba(162,89,247,0.7);
-    }
-  }
+}
+
+/* Theme variables */
+:root {
+  --color-bg: #f8fafc;
+  --color-bg-secondary: #fff;
+  --color-text: #1e293b;
+  --color-accent: #6366f1;
+  --color-accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+[data-theme="light"] {
+  --color-bg: #f8fafc;
+  --color-bg-secondary: #fff;
+  --color-text: #1e293b;
+  --color-accent: #6366f1;
+  --color-accent-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+[data-theme="purple"] {
+  --color-bg: #181c2a; /* Deep navy background */
+  --color-bg-secondary: #232946; /* Card background */
+  --color-text: #f3f6fb; /* Soft white text */
+  --color-accent: #378fe9; /* LinkedIn blue accent */
+  --color-accent-gradient: linear-gradient(135deg, #378fe9 0%, #16437e 100%);
+}
+
+/* Card enhancements for dark mode */
+[data-theme="purple"] .bg-main,
+[data-theme="purple"] .bg-secondary {
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.25);
+  border: 1px solid #232946;
+}
+
+[data-theme="purple"] .card-hover:hover {
+  box-shadow: 0 8px 32px 0 rgba(55,143,233,0.15);
+  border-color: #378fe9;
+}
+
+[data-theme="purple"] .text-accent {
+  color: #378fe9;
+}
+
+[data-theme="purple"] .bg-accent {
+  background: #378fe9;
+  color: #fff;
+}
+
+[data-theme="purple"] .border-accent {
+  border-color: #378fe9;
+}
+
+body, html {
+  background: var(--color-bg);
+  color: var(--color-text);
+}
+
+body.modal-open {
+  overflow: hidden !important;
+}
+
+.bg-main {
+  background: var(--color-bg);
+}
+.bg-secondary {
+  background: var(--color-bg-secondary);
+}
+.text-main {
+  color: var(--color-text);
+}
+.text-accent {
+  color: var(--color-accent);
+}
+.gradient-text, .text-gradient {
+  background: var(--color-accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }

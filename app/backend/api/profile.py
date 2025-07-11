@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
-from models.user import db, User
+from models.user import db, User, Notification
 import os
 from werkzeug.utils import secure_filename
 from PIL import Image
@@ -76,12 +76,26 @@ def update_profile():
     if not user:
         return jsonify({'error': 'User not found'}), 404
     data = request.get_json()
-    allowed_fields = ["bio", "skills", "work_experience", "education", "contact_info", "image_url"]
+    allowed_fields = ["username", "email", "bio", "skills", "work_experience", "education", "contact_info", "image_url"]
     update_data = {k: v for k, v in data.items() if k in allowed_fields}
     # Validation rules
     for field, value in update_data.items():
         if not isinstance(value, str):
             return jsonify({'error': f'{field} must be a string'}), 400
+        if field == 'username':
+            if len(value) > 80:
+                return jsonify({'error': 'Username must be 80 characters or less.'}), 400
+            # Check uniqueness
+            existing = type(user).query.filter_by(username=value).filter(type(user).id != user_id).first()
+            if existing:
+                return jsonify({'error': 'Username already exists.'}), 400
+        if field == 'email':
+            if len(value) > 120 or not ("@" in value and "." in value):
+                return jsonify({'error': 'Enter a valid email address (max 120 chars).'}), 400
+            # Check uniqueness
+            existing = type(user).query.filter_by(email=value).filter(type(user).id != user_id).first()
+            if existing:
+                return jsonify({'error': 'Email already exists.'}), 400
         if field == 'bio' and len(value) > 1000:
             return jsonify({'error': 'Bio too long (max 1000 chars)'}), 400
         if field == 'skills' and len(value) > 500:
@@ -96,7 +110,9 @@ def update_profile():
             return jsonify({'error': 'Image URL too long (max 256 chars)'}), 400
     if not update_data:
         return jsonify({'error': 'No valid fields to update'}), 400
-    user.update_profile(update_data)
+    # Actually update fields
+    for field, value in update_data.items():
+        setattr(user, field, value)
     db.session.commit()
     profile = {
         'id': user.id,
@@ -191,4 +207,32 @@ def upload_profile_image():
             if 'path' in locals() and os.path.exists(path):
                 os.remove(path)
         return jsonify({'error': 'Image upload failed', 'details': str(e)}), 400
+
+@profile_bp.route('/api/users', methods=['GET'])
+def list_users():
+    users = User.query.with_entities(User.id, User.username).all()
+    return jsonify([{'id': u.id, 'username': u.username} for u in users])
+
+@profile_bp.route('/api/notifications', methods=['GET'])
+@jwt_required()
+def get_notifications():
+    user_id = get_jwt_identity()
+    notifs = Notification.query.filter_by(user_id=user_id).order_by(Notification.created_at.desc()).all()
+    return jsonify([
+        {
+            'id': n.id,
+            'message': n.message,
+            'is_read': n.is_read,
+            'created_at': n.created_at.isoformat()
+        } for n in notifs
+    ])
+
+@profile_bp.route('/api/notifications/<int:notif_id>/read', methods=['PATCH'])
+@jwt_required()
+def mark_notification_read(notif_id):
+    user_id = get_jwt_identity()
+    notif = Notification.query.filter_by(id=notif_id, user_id=user_id).first_or_404()
+    notif.is_read = True
+    db.session.commit()
+    return jsonify({'message': 'Notification marked as read.'})
 

@@ -55,14 +55,14 @@ const Section: React.FC<{title: string, children: React.ReactNode, defaultOpen?:
 
 const ProfileInfo: React.FC = () => {
   return (
-    <div className="bg-white shadow rounded-lg p-6 mb-4">
+    <div className="bg-main shadow rounded-lg p-6 mb-4">
       <Section title="Bio" defaultOpen>
-        <p>{mockUserInfo.bio}</p>
+        <p className="text-main">{mockUserInfo.bio}</p>
       </Section>
       <Section title="Skills" defaultOpen>
         <ul className="flex flex-wrap gap-2">
           {mockUserInfo.skills.map(skill => (
-            <li key={skill} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">{skill}</li>
+            <li key={skill} className="bg-secondary text-accent px-3 py-1 rounded-full text-sm">{skill}</li>
           ))}
         </ul>
       </Section>
@@ -70,9 +70,9 @@ const ProfileInfo: React.FC = () => {
         <ul>
           {mockUserInfo.experience.map((exp, idx) => (
             <li key={idx} className="mb-2">
-              <div className="font-semibold">{exp.title} @ {exp.company}</div>
-              <div className="text-gray-500 text-sm">{exp.period}</div>
-              <div>{exp.description}</div>
+              <div className="font-semibold text-main">{exp.title} @ {exp.company}</div>
+              <div className="text-secondary text-sm">{exp.period}</div>
+              <div className="text-main">{exp.description}</div>
             </li>
           ))}
         </ul>
@@ -81,16 +81,16 @@ const ProfileInfo: React.FC = () => {
         <ul>
           {mockUserInfo.education.map((edu, idx) => (
             <li key={idx} className="mb-2">
-              <div className="font-semibold">{edu.degree} - {edu.school}</div>
-              <div className="text-gray-500 text-sm">{edu.period}</div>
+              <div className="font-semibold text-main">{edu.degree} - {edu.school}</div>
+              <div className="text-secondary text-sm">{edu.period}</div>
             </li>
           ))}
         </ul>
       </Section>
       <Section title="Contact Information">
-        <div>Email: <a href={`mailto:${mockUserInfo.contact.email}`} className="text-blue-600 underline">{mockUserInfo.contact.email}</a></div>
-        <div>Phone: <a href={`tel:${mockUserInfo.contact.phone}`} className="text-blue-600 underline">{mockUserInfo.contact.phone}</a></div>
-        <div>Website: <a href={mockUserInfo.contact.website} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">{mockUserInfo.contact.website}</a></div>
+        <div className="text-main">Email: <a href={`mailto:${mockUserInfo.contact.email}`} className="text-accent underline">{mockUserInfo.contact.email}</a></div>
+        <div className="text-main">Phone: <a href={`tel:${mockUserInfo.contact.phone}`} className="text-accent underline">{mockUserInfo.contact.phone}</a></div>
+        <div className="text-main">Website: <a href={mockUserInfo.contact.website} target="_blank" rel="noopener noreferrer" className="text-accent underline">{mockUserInfo.contact.website}</a></div>
       </Section>
     </div>
   );

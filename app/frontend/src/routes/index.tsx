@@ -13,42 +13,18 @@ import GlobalLayout from '../components/GlobalLayout';
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <GlobalLayout><Login /></GlobalLayout>,
-  },
-  {
-    path: '/login',
-    element: <GlobalLayout><Login /></GlobalLayout>,
-  },
-  {
-    path: '/signup',
-    element: <GlobalLayout><Signup /></GlobalLayout>,
-  },
-  {
-    path: '/profile',
-    element: <GlobalLayout><ProfileView /></GlobalLayout>,
-  },
-  {
-    path: '/profile/edit',
-    element: <GlobalLayout><ProfileEdit /></GlobalLayout>,
-  },
-  {
-    path: '/posts/create',
-    element: <GlobalLayout><PostCreate /></GlobalLayout>,
-  },
-  {
-    path: '/posts',
-    element: <GlobalLayout><PostList /></GlobalLayout>,
-  },
-  {
-    path: '/jobs',
-    element: <GlobalLayout><JobList /></GlobalLayout>,
-  },
-  {
-    path: '/messages',
-    element: <GlobalLayout><MessageList /></GlobalLayout>,
-  },
-  {
-    path: '/feed',
-    element: <GlobalLayout><Feed /></GlobalLayout>,
+    element: <GlobalLayout />, // Use Outlet in GlobalLayout
+    children: [
+      { index: true, element: <Login /> },
+      { path: 'login', element: <Login /> },
+      { path: 'signup', element: <Signup /> },
+      { path: 'profile', element: <ProfileView /> },
+      { path: 'profile/edit', element: <ProfileEdit /> },
+      { path: 'posts/create', element: <PostCreate /> },
+      { path: 'posts', element: <PostList /> },
+      { path: 'jobs', element: <JobList /> },
+      { path: 'messages', element: <MessageList /> },
+      { path: 'feed', element: <Feed /> },
+    ],
   },
 ]); 

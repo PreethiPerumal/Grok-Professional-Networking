@@ -26,26 +26,26 @@ const ProfileActivity: React.FC = () => {
   const hasMore = visible.length < total;
 
   return (
-    <div className="bg-white shadow rounded-lg p-6 mb-4">
+    <div className="bg-main shadow rounded-lg p-6 mb-4">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-4">
-        <div>
+        <div className="text-main">
           <span className="font-bold text-lg">Connections:</span> {mockActivity.connections}
           <span className="ml-4 font-bold text-lg">Mutual:</span> {mockActivity.mutualConnections}
         </div>
       </div>
       <div>
-        <h3 className="font-semibold text-md mb-2">Activity Timeline</h3>
+        <h3 className="font-semibold text-md mb-2 text-main">Activity Timeline</h3>
         <ul>
           {visible.map((item, idx) => (
             <li key={idx} className="mb-2 border-l-4 pl-2 border-blue-200">
-              <span className="text-gray-500 text-xs mr-2">{item.date}</span>
-              <span className="font-medium">{item.content}</span>
+              <span className="text-secondary text-xs mr-2">{item.date}</span>
+              <span className="font-medium text-main">{item.content}</span>
             </li>
           ))}
         </ul>
         {hasMore && (
           <button
-            className="mt-2 px-4 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+            className="mt-2 px-4 py-1 bg-accent text-white rounded hover:bg-accent-dark"
             onClick={() => setPage(page + 1)}
           >
             Load More
