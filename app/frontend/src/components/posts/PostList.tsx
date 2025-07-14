@@ -3,9 +3,13 @@ import { useAuth } from '../../context/AuthContext';
 import PostComments from './PostComments';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import ReactLinkPreview from 'react-link-preview';
 import { useLocation } from 'react-router-dom';
 import PostCreate from './PostCreate';
+import { useInfiniteQuery } from '@tanstack/react-query';
+import Card from './Card';
+import AnimatedButton from './AnimatedButton';
+import Loader from './Loader';
+import ErrorState from './ErrorState';
 
 interface Post {
   id: number;
@@ -27,9 +31,26 @@ interface PostAnalytics {
   view_count: number;
 }
 
+type PostListQueryKey = [string, { q: string; tag: string; visibility: string; category: string; sort: string }];
+
+const fetchPosts = async ({ pageParam = 1, queryKey }: { pageParam?: number; queryKey: any }) => {
+  const [_key, { q, tag, visibility, category, sort }] = queryKey;
+  const params = new URLSearchParams({
+    page: String(pageParam),
+    per_page: '10',
+    ...(q && { q }),
+    ...(tag && { tag }),
+    ...(visibility && { visibility }),
+    ...(category && { category }),
+    ...(sort && { sort }),
+  });
+  const res = await fetch(`/api/posts?${params.toString()}`);
+  if (!res.ok) throw new Error('Failed to fetch posts');
+  return res.json();
+};
+
 const PostList: React.FC = () => {
   const { user, token } = useAuth();
-  const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
@@ -49,6 +70,40 @@ const PostList: React.FC = () => {
   const location = useLocation();
   const [searchResults, setSearchResults] = useState<Post[] | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [category, setCategory] = useState('');
+  const [sort, setSort] = useState('newest');
+
+  const {
+    data,
+    error: queryError,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    refetch,
+    status,
+  } = useInfiniteQuery({
+    queryKey: ['posts', { q, tag, visibility, category, sort }],
+    queryFn: fetchPosts,
+    getNextPageParam: (lastPage: any) => {
+      if (lastPage.page < lastPage.pages) return lastPage.page + 1;
+      return undefined;
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    initialPageParam: 1,
+  });
+
+  // Infinite scroll logic
+  useEffect(() => {
+    const onScroll = () => {
+      if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000 && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    };
+
+    window.addEventListener('scroll', onScroll);
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   // Lock background scroll when modal is open
   useEffect(() => {
@@ -59,29 +114,6 @@ const PostList: React.FC = () => {
     }
     return () => document.body.classList.remove('modal-open');
   }, [showCreate]);
-
-  const fetchPosts = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({
-        page: String(page),
-        per_page: '10',
-        ...(q && { q }),
-        ...(tag && { tag }),
-        ...(visibility && { visibility }),
-      });
-      const res = await fetch(`/api/posts?${params.toString()}`);
-      if (!res.ok) throw new Error('Failed to fetch posts');
-      const data = await res.json();
-      setPosts(data.posts);
-      setPages(data.pages);
-    } catch (err) {
-      setError('Error loading posts');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchAnalytics = async (postId: number) => {
     const res = await fetch(`/api/posts/${postId}`);
@@ -96,17 +128,17 @@ const PostList: React.FC = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
+    refetch();
     // eslint-disable-next-line
   }, [page, q, tag, visibility]);
 
   // Fetch analytics for all posts on posts change
   useEffect(() => {
-    posts.forEach(post => {
+    data?.pages.flatMap((p: any) => p.posts).forEach(post => {
       fetchAnalytics(post.id);
     });
     // eslint-disable-next-line
-  }, [posts]);
+  }, [data]);
 
   const handleLike = async (postId: number) => {
     if (!token) return;
@@ -117,7 +149,7 @@ const PostList: React.FC = () => {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (res.ok) {
-        fetchPosts();
+        refetch();
       }
     } finally {
       setLikeLoading(null);
@@ -133,7 +165,7 @@ const PostList: React.FC = () => {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (res.ok) {
-        fetchPosts();
+        refetch();
       }
     } finally {
       setLikeLoading(null);
@@ -165,7 +197,7 @@ const PostList: React.FC = () => {
       });
       if (res.ok) {
         setEditPost(null);
-        fetchPosts();
+        refetch();
       }
     } finally {
       setEditLoading(false);
@@ -182,7 +214,7 @@ const PostList: React.FC = () => {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       if (res.ok) {
-        fetchPosts();
+        refetch();
       }
     } finally {
       setDeleteLoading(null);
@@ -306,66 +338,62 @@ const PostList: React.FC = () => {
 
   const handlePostCreated = () => {
     setShowCreate(false);
-    fetchPosts();
+    refetch();
   };
 
   return (
     <div className="max-w-4xl mx-auto p-4 bg-main">
       {/* LinkedIn-style "Start a post" box */}
-      <div className="bg-main rounded-2xl shadow-xl border border-gray-200 dark:border-[#232946] p-6">
+      <Card className="mb-6">
         {!showCreate ? (
           <div className="flex items-start space-x-4">
             <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-white font-semibold text-lg flex-shrink-0">
               {user?.name?.charAt(0).toUpperCase() || 'U'}
             </div>
-            <button
+            <AnimatedButton
               onClick={() => setShowCreate(true)}
               className="flex-1 text-left p-4 rounded-xl border-2 border-gray-200 dark:border-[#232946] hover:border-accent transition-colors bg-secondary hover:bg-gray-50 dark:hover:bg-[#232946]"
             >
               <span className="text-secondary">Start a post...</span>
-            </button>
+            </AnimatedButton>
           </div>
         ) : (
           <div className="bg-main rounded-xl shadow-lg border border-gray-200 dark:border-[#232946] overflow-hidden max-h-[80vh] overflow-y-auto">
             <div className="bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-4 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-white">Creating New Post</h3>
-              <button
-                className="text-white hover:text-gray-200 transition-colors duration-200"
+              <AnimatedButton
                 onClick={() => setShowCreate(false)}
+                className="text-white hover:text-gray-200 transition-colors duration-200"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
-              </button>
+              </AnimatedButton>
             </div>
             <PostCreate onPostCreated={handlePostCreated} />
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Advanced Search */}
       <AdvancedSearch onResults={setSearchResults} />
 
       {/* Posts Feed */}
       <div className="space-y-6">
-        {loading ? (
-          <div className="flex justify-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-accent"></div>
-          </div>
-        ) : error ? (
-          <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 text-red-700 dark:text-red-400">
-            {error}
-          </div>
+        {isFetching && !isFetchingNextPage ? (
+          <Loader />
+        ) : queryError ? (
+          <ErrorState message={String(queryError)} onRetry={refetch} />
         ) : searchResults ? (
           <div>
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-semibold text-main">Search Results</h2>
-              <button
+              <AnimatedButton
                 onClick={() => setSearchResults(null)}
                 className="text-accent hover:text-accent-dark transition-colors"
               >
                 Clear Search
-              </button>
+              </AnimatedButton>
             </div>
             {searchResults.length === 0 ? (
               <div className="text-center py-8 text-secondary">No posts found matching your search criteria.</div>
@@ -376,21 +404,21 @@ const PostList: React.FC = () => {
             )}
           </div>
         ) : (
-          posts.length === 0 ? (
+          data?.pages.flatMap((p: any) => p.posts).length === 0 ? (
             <div className="text-center py-12">
               <div className="text-6xl mb-4">📝</div>
               <h3 className="text-xl font-semibold text-main mb-2">No posts yet</h3>
               <p className="text-secondary mb-4">Be the first to share something with your network!</p>
-              <button
+              <AnimatedButton
                 onClick={() => setShowCreate(true)}
                 className="bg-accent text-white px-6 py-3 rounded-lg font-semibold hover:bg-accent-dark transition-colors"
               >
                 Create Your First Post
-              </button>
+              </AnimatedButton>
             </div>
           ) : (
             <>
-              {posts.map(post => (
+              {data?.pages.flatMap((p: any) => p.posts).map(post => (
                 <PostCard key={post.id} post={post} onLike={handleLike} onUnlike={handleUnlike} />
               ))}
             </>
@@ -399,37 +427,27 @@ const PostList: React.FC = () => {
       </div>
 
       {/* Pagination */}
-      {pages > 1 && (
+      {hasNextPage && (
         <div className="flex justify-center space-x-2 mt-8">
-          <button
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
+          <AnimatedButton
+            onClick={() => fetchNextPage()}
+            disabled={isFetchingNextPage}
             className="px-4 py-2 rounded-lg bg-secondary text-main hover:bg-gray-200 dark:hover:bg-[#232946] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            Previous
-          </button>
-          <span className="px-4 py-2 text-secondary">
-            Page {page} of {pages}
-          </span>
-          <button
-            onClick={() => setPage(p => Math.min(pages, p + 1))}
-            disabled={page === pages}
-            className="px-4 py-2 rounded-lg bg-secondary text-main hover:bg-gray-200 dark:hover:bg-[#232946] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-          >
-            Next
-          </button>
+            {isFetchingNextPage ? 'Loading...' : 'Load More'}
+          </AnimatedButton>
         </div>
       )}
       {/* Edit Modal */}
       {editPost && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-lg relative">
-            <button
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            <AnimatedButton
               onClick={() => setEditPost(null)}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
             >
               &times;
-            </button>
+            </AnimatedButton>
             <h3 className="text-lg font-bold mb-4">Edit Post</h3>
             <form onSubmit={handleEditSubmit}>
               <div className="mb-3">
@@ -464,13 +482,13 @@ const PostList: React.FC = () => {
                   <option value="private">Private</option>
                 </select>
               </div>
-              <button
+              <AnimatedButton
                 type="submit"
                 className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 disabled={editLoading}
               >
                 {editLoading ? 'Saving...' : 'Save Changes'}
-              </button>
+              </AnimatedButton>
             </form>
           </div>
         </div>
@@ -485,7 +503,7 @@ const PostCard: React.FC<{ post: Post; onLike: (id: number) => void; onUnlike: (
   const [liked, setLiked] = useState(false);
 
   return (
-    <div className="bg-main rounded-2xl shadow-xl border border-gray-200 dark:border-[#232946] overflow-hidden">
+    <Card className="bg-main rounded-2xl shadow-xl border border-gray-200 dark:border-[#232946] overflow-hidden">
       {/* Post Header */}
       <div className="p-6 border-b border-gray-100 dark:border-[#232946]">
         <div className="flex items-start space-x-4">
@@ -539,7 +557,7 @@ const PostCard: React.FC<{ post: Post; onLike: (id: number) => void; onUnlike: (
       <div className="px-6 py-4 border-t border-gray-100 dark:border-[#232946]">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-6">
-            <button
+            <AnimatedButton
               onClick={() => {
                 if (liked) {
                   onUnlike(post.id);
@@ -554,8 +572,8 @@ const PostCard: React.FC<{ post: Post; onLike: (id: number) => void; onUnlike: (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
               </svg>
               <span>{post.like_count || 0} Likes</span>
-            </button>
-            <button
+            </AnimatedButton>
+            <AnimatedButton
               onClick={() => setShowComments(!showComments)}
               className="flex items-center space-x-2 text-secondary hover:text-accent transition-colors"
             >
@@ -563,7 +581,7 @@ const PostCard: React.FC<{ post: Post; onLike: (id: number) => void; onUnlike: (
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
               </svg>
               <span>{post.comment_count || 0} Comments</span>
-            </button>
+            </AnimatedButton>
           </div>
           <div className="text-sm text-secondary">
             {post.view_count || 0} views
@@ -577,7 +595,7 @@ const PostCard: React.FC<{ post: Post; onLike: (id: number) => void; onUnlike: (
           <PostComments postId={post.id} />
         </div>
       )}
-    </div>
+    </Card>
   );
 };
 

@@ -16,7 +16,7 @@ export const messagingApi = {
         'Authorization': `Bearer ${localStorage.getItem('token')}`,
       },
     });
-    return response.json();
+       return response.json();
   },
 
   sendMessage: async (conversationId: number, content: string) => {

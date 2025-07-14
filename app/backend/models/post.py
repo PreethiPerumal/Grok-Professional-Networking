@@ -8,10 +8,11 @@ class Post(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     content = db.Column(db.Text, nullable=False)
     media_url = db.Column(db.String(255), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     title = db.Column(db.String(120), nullable=False)
-    tags = db.Column(db.String(255), nullable=True)
-    visibility = db.Column(db.String(10), default='public')
+    tags = db.Column(db.String(255), nullable=True, index=True)
+    visibility = db.Column(db.String(10), default='public', index=True)
+    category = db.Column(db.String(64), nullable=True, index=True)
     # Add metadata fields as needed for future search/indexing
     # e.g., tags, is_public, etc.
 

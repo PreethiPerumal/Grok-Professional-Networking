@@ -1,12 +1,15 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { authApi } from './api';
+import Card from '../posts/Card';
+import AnimatedButton from '../posts/AnimatedButton';
 
 const Login: React.FC = () => {
   const [form, setForm] = useState({ usernameOrEmail: '', password: '' });
   const [errors, setErrors] = useState<{ usernameOrEmail?: string; password?: string }>({});
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -51,7 +54,7 @@ const Login: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-main p-4">
-      <div className="w-full max-w-4xl bg-main rounded-2xl shadow-2xl border border-gray-200 dark:border-[#232946] flex flex-col md:flex-row overflow-hidden">
+      <Card className="w-full max-w-4xl flex flex-col md:flex-row overflow-hidden">
         {/* Left Banner/Brand */}
         <div className="hidden md:flex flex-col justify-center items-center bg-gradient-to-br from-blue-700 to-blue-500 w-1/2 p-10 text-white relative">
           <div className="w-20 h-20 rounded-full bg-white bg-opacity-20 flex items-center justify-center mb-6 border-4 border-white shadow-lg">
@@ -91,15 +94,37 @@ const Login: React.FC = () => {
             </div>
             <div>
               <label className="block text-sm font-semibold text-main mb-2">Password</label>
-              <input
-                type="password"
-                name="password"
-                value={form.password}
-                onChange={handleChange}
-                className="w-full bg-secondary border-2 border-gray-200 dark:border-[#232946] rounded-lg p-3 text-main placeholder-gray-400 dark:placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent focus:ring-opacity-20 transition-all duration-200"
-                placeholder="Enter your password"
-                disabled={loading}
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={form.password}
+                  onChange={handleChange}
+                  className="w-full bg-secondary border-2 border-gray-200 dark:border-[#232946] rounded-lg p-3 text-main placeholder-gray-400 dark:placeholder-gray-500 focus:border-accent focus:ring-2 focus:ring-accent focus:ring-opacity-20 transition-all duration-200 pr-10"
+                  placeholder="Enter your password"
+                  disabled={loading}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  <svg
+                    className="h-5 w-5 text-gray-500 dark:text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    {showPassword ? (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.96 9.96 0 011.563-2.037m3.12 3.12A3 3 0 0012 15a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3z" />
+                    ) : (
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.96 9.96 0 011.563-2.037m3.12 3.12A3 3 0 0012 15a3 3 0 003-3 3 3 0 00-3-3 3 3 0 00-3 3 3 3 0 003 3z" />
+                    )}
+                  </svg>
+                </button>
+              </div>
               {errors.password && (
                 <div className="flex items-center mt-2 text-red-500 text-sm">
                   <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -109,7 +134,7 @@ const Login: React.FC = () => {
                 </div>
               )}
             </div>
-            <button
+            <AnimatedButton
               type="submit"
               className="w-full bg-[#0A66C2] text-white py-3 px-6 rounded-lg font-semibold hover:bg-blue-700 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center text-lg shadow"
               disabled={loading}
@@ -125,10 +150,10 @@ const Login: React.FC = () => {
               ) : (
                 <>Sign In</>
               )}
-            </button>
+            </AnimatedButton>
           </form>
           {message && (
-            <div className={`mt-6 ${message.includes('success') ? 'text-green-600' : 'text-red-500'}`}>
+            <div className={`mt-6 ${message.includes('success') ? 'text-green-600' : 'text-red-500'}`} aria-live="polite">
               <div className={`p-4 rounded-lg flex items-center ${
                 message.includes('success') ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
               }`}>
@@ -145,12 +170,12 @@ const Login: React.FC = () => {
           )}
           <div className="mt-8 text-center text-gray-600">
             <span>Don't have an account? </span>
-            <Link to="/signup" className="text-[#0A66C2] hover:underline font-semibold transition-colors duration-200">
+            <Link to="/signup" className="text-[#0A66C2] hover:underline font-semibold transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
               Sign up
             </Link>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };
