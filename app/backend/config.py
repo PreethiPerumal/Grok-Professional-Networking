@@ -18,3 +18,4 @@ class Config:
     
     # CORS
     CORS_HEADERS = 'Content-Type' 
+    # 

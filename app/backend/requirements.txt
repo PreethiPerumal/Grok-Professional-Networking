@@ -12,3 +12,4 @@ black==23.7.0
 flake8==6.1.0 
 gunicorn 
 pymysql 
+psycopg2-binary 
