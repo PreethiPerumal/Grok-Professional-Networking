@@ -15,6 +15,7 @@
     "@types/react-dom": "^17.0.26",
     "@types/react-router-dom": "^5.3.3",
     "axios": "^1.10.0",
+    "framer-motion": "^12.23.6",
     "quill-mention": "^6.1.1",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
