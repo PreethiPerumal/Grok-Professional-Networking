@@ -1,5 +1,4 @@
-import pymysql
-pymysql.install_as_MySQLdb()
+
 
 from flask import Flask, send_from_directory
 from flask_cors import CORS
@@ -14,15 +13,17 @@ from api.auth import auth_bp
 from api.profile import profile_bp
 from api.posts import posts_bp
 
-# Load environment variables
+
 load_dotenv()
 
 # Import models
 # from models.profile import Profile, Skill, Experience, Education
 
 # Create Flask app
+
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'  # Force SQLite, ignore env
 
 # Initialize extensions
 ALLOWED_ORIGINS = os.getenv('ALLOWED_ORIGINS', 'http://localhost:5173,http://127.0.0.1:5173,https://your-frontend-url.onrender.com').split(',')
